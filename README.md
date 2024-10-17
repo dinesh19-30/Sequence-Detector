@@ -136,6 +136,91 @@ Output: ![mealey out](https://github.com/user-attachments/assets/fb44afcf-7113-4
 
 Testbench for Sequence Detector (Moore and Mealy FSMs)
 
+Testbench for sequence detector : Moore FSMs
+
+CODE:`timescale 1ns/1ps
+
+module tb_fsm_sequence;
+
+ 
+ reg clk;
+    reg reset;
+    reg run;
+    wire [3:0] count;
+    fsm_sequence uut (
+        .clk(clk),
+        .reset(reset),
+        .run(run),
+        .count(count)
+    );
+
+always #10 clk = ~clk; 
+clk = 0;
+      reset = 1;
+        run = 0;
+
+#20 reset = 0;  
+ #20 run = 1;  
+#100 run = 0;  
+        #40 run = 1;    
+        #100 $finish;  
+    end
+    initial begin
+        $monitor("Time: %0t | clk: %b | reset: %b | run: %b | count: %d", 
+                 $time, clk, reset, run, count);
+    end
+    initial begin
+        $dumpfile("fsm_sequence_tb.vcd");
+        $dumpvars(0, tb_fsm_sequence);
+end
+
+endmodule
+
+Output:
+
+
+Testbench for sequence detector : Mealey FSMs
+
+`timescale 1ns/1ns
+
+ module mealy_tb;
+
+ wire out;
+
+ reg clk,rst,inp;
+
+ reg [15:0] seq; 
+
+ integer i;
+
+ mealy instance22(clk, rst, inp, out);
+
+ initial begin
+ clk=0;
+rst=1;
+seq=16'b1010_0001_1100_0101;
+
+#5 rst=0;
+
+ end
+
+ always begin
+
+  $dumpfile("mealy_direct.vcd");
+    $dumpvars();
+  for( i = 0; i <= 15; i = i+1)
+  begin
+   inp = seq[i];
+   #2 clk=1;
+#2 clk=0;
+$display("state = ",instance22.state,"| input = ",inp,"| output = ",out);
+end
+#100 $finish();
+end
+endmodule 
+
+Output:
+
 
 
 
