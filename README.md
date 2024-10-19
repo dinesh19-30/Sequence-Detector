@@ -132,50 +132,118 @@ endmodule
 Output: ![mealey out](https://github.com/user-attachments/assets/fb44afcf-7113-417d-aff7-739028944eb1)
 
 
-
-
-Testbench for Sequence Detector (Moore and Mealy FSMs)
-
-`timescale 1ns/1ps
+Testbench for moore:
 
 module tb_fsm_sequence;
- 
-  reg clk;
+
+ reg clk;
     reg reset;
     reg run;
     wire [3:0] count;
- 
-fsm_sequence uut (
+    fsm_sequence uut (
         .clk(clk),
         .reset(reset),
         .run(run),
         .count(count)
     );
-  
- always #10 clk = ~clk; // Toggle clock every 10 time units (20ns period)
-    initial begin
-      
-clk = 0;
+  always #10 clk = ~clk;
+  initial begin
+        clk = 0;
         reset = 1;
         run = 0;
-        #20 reset = 0;  // De-assert reset after 20ns
-        #20 run = 1;    // Start running the FSM after 20ns
-       #100 run = 0;   // Stop the FSM by disabling run
-        #40 run = 1;    // Restart the FSM after a short pause
-        #100 $finish;   // End the simulation
+        #20 reset = 0; 
+        #20 run = 1;   
+        #100 run = 0;   
+        #40 run = 1;   
+        #100 $finish;   
     end
- initial begin
+   
+   initial begin
         $monitor("Time: %0t | clk: %b | reset: %b | run: %b | count: %d", 
                  $time, clk, reset, run, count);
     end
- initial begin
+
+  initial begin
         $dumpfile("fsm_sequence_tb.vcd");
         $dumpvars(0, tb_fsm_sequence);
     end
 
 endmodule
 
-Output: ![tb](https://github.com/user-attachments/assets/b39b99ce-815c-4662-93e9-664a52cd4350)
+Output: ![moore tb](https://github.com/user-attachments/assets/4684fd36-f136-4515-bfac-46a9659c5854)
+
+Testbench for Mealey:
+
+module mealy(clk,rst,inp,out);
+ input clk, rst, inp;
+ output out;
+ reg out;
+ reg [1:0] state;
+ always @(posedge clk, posedge rst)
+ begin
+     if(rst)
+     begin
+     out <= 0;
+            state <= 2'b00;
+         end
+     else
+         begin
+             case (state)
+             2'b00: 
+                 begin
+                     if (inp) begin
+                         state <=2'b01;
+                         out <=0;
+                     end
+                     else begin
+                         state <=2'b10;
+                         out <=0;
+                    end
+                 end
+             2'b01:
+                 begin
+
+ if(inp) begin
+  state <= 2'b00;
+   out <= 1;
+ end
+
+ else begin
+  state <= 2'b10;
+ out <= 0
+end
+ end
+ 2'b10:
+begin
+ if(inp)
+ begin
+
+  state <= 2'b01;
+
+  out <= 0;
+
+  end
+ else begin
+
+  state <= 2'b00;
+      out <= 1;
+         end
+    end
+ default:
+                 begin
+                     state <= 2'b00;
+                     out <= 0;
+                 end
+             endcase
+         end
+ end
+ endmodule
+
+ Output: ![mealey tb](https://github.com/user-attachments/assets/3a93788a-8c33-43b2-8f52-7952f47f942d)
+
+
+
+
 
 
 
